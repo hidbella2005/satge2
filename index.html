@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Hotel Management System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Discover Amazing Hotels in Morocco</h1>
+                <p class="lead mb-4">Find the perfect accommodation for your stay in Morocco's most beautiful cities. From luxury resorts to budget-friendly options.</p>
+                <a href="{{ url_for('hotels') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-search me-2"></i>Browse Hotels
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="fas fa-hotel" style="font-size: 8rem; opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Search -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h4 class="card-title text-center mb-4">Quick Hotel Search</h4>
+                        <form action="{{ url_for('hotels') }}" method="GET">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="search" class="form-label">Hotel Name</label>
+                                    <input type="text" class="form-control" id="search" name="search" placeholder="Enter hotel name...">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="city_id" class="form-label">City</label>
+                                    <select class="form-select" id="city_id" name="city_id">
+                                        <option value="">All Cities</option>
+                                        {% for city in cities %}
+                                        <option value="{{ city.id }}">{{ city.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search me-1"></i>Search
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Hotels -->
+{% if featured_hotels %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Featured Hotels</h2>
+        <div class="row">
+            {% for hotel in featured_hotels %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if hotel.image_url %}
+                    <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-hotel fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ hotel.name }}</h5>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-map-marker-alt me-1"></i>{{ hotel.city.name }}
+                        </p>
+                        {% if hotel.description %}
+                        <p class="card-text">{{ hotel.description[:100] }}{% if hotel.description|length > 100 %}...{% endif %}</p>
+                        {% endif %}
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="rating">
+                                    {% for i in range(5) %}
+                                        {% if i < hotel.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-1">{{ "%.1f"|format(hotel.rating) }}</span>
+                                </div>
+                                <span class="badge bg-success">${{ "%.2f"|format(hotel.price_per_night) }}/night</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('hotels') }}" class="btn btn-outline-primary">
+                View All Hotels <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Statistics Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <i class="fas fa-hotel fa-3x text-primary mb-3"></i>
+                        <h3 class="fw-bold">{{ featured_hotels|length if featured_hotels else 0 }}+</h3>
+                        <p class="text-muted">Premium Hotels</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <i class="fas fa-map-marked-alt fa-3x text-success mb-3"></i>
+                        <h3 class="fw-bold">{{ cities|length if cities else 0 }}+</h3>
+                        <p class="text-muted">Moroccan Cities</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-3x text-info mb-3"></i>
+                        <h3 class="fw-bold">1000+</h3>
+                        <p class="text-muted">Happy Customers</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                        <h3 class="fw-bold">4.8</h3>
+                        <p class="text-muted">Average Rating</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+{% if not current_user.is_authenticated %}
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Start Your Journey?</h2>
+        <p class="lead mb-4">Join thousands of travelers who trust us for their hotel bookings in Morocco.</p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg me-3">
+            <i class="fas fa-user-plus me-2"></i>Sign Up Now
+        </a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+        </a>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
