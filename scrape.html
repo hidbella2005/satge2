@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Hotel Scraper - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-download me-2"></i>Hotel Data Scraper</h1>
+            <p class="text-muted">Scrape hotel data from Booking.com for Moroccan cities.</p>
+        </div>
+    </div>
+
+    <!-- Scraping Form -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-globe me-2"></i>Scrape Hotels from Booking.com</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="cities" class="form-label">Moroccan Cities</label>
+                            <textarea class="form-control" id="cities" name="cities" rows="3" 
+                                      placeholder="Enter city names separated by commas (e.g., Marrakech, Casablanca, Fez)"></textarea>
+                            <small class="text-muted">Enter the names of Moroccan cities you want to scrape hotels from.</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="limit" class="form-label">Hotels per City</label>
+                            <select class="form-select" id="limit" name="limit">
+                                <option value="5">5 hotels per city</option>
+                                <option value="10">10 hotels per city</option>
+                                <option value="15">15 hotels per city</option>
+                                <option value="20">20 hotels per city</option>
+                            </select>
+                            <small class="text-muted">Number of hotels to scrape from each city.</small>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Important:</strong> Scraping may take several minutes depending on the number of cities and hotels. 
+                            The process includes delays to respect the website's rate limits.
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-download me-2"></i>Start Scraping
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Quick Presets -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Quick Presets</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-primary w-100" onclick="setPreset('major')">
+                                <i class="fas fa-city me-1"></i>Major Cities
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-success w-100" onclick="setPreset('tourist')">
+                                <i class="fas fa-camera me-1"></i>Tourist Destinations
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-info w-100" onclick="setPreset('coastal')">
+                                <i class="fas fa-water me-1"></i>Coastal Cities
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-warning w-100" onclick="setPreset('imperial')">
+                                <i class="fas fa-crown me-1"></i>Imperial Cities
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Scraping Guidelines -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Scraping Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>The scraper collects hotel names, addresses, ratings, prices, and descriptions</li>
+                        <li>Data is automatically saved to the database with a "Scraped Hotel" category</li>
+                        <li>Duplicate hotels (same name in same city) are automatically skipped</li>
+                        <li>The process respects rate limits with delays between requests</li>
+                        <li>Scraped hotels appear immediately in the admin hotels section</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function setPreset(type) {
+    const citiesTextarea = document.getElementById('cities');
+    
+    switch(type) {
+        case 'major':
+            citiesTextarea.value = 'Casablanca, Rabat, Marrakech, Fez';
+            break;
+        case 'tourist':
+            citiesTextarea.value = 'Marrakech, Chefchaouen, Essaouira, Ouarzazate';
+            break;
+        case 'coastal':
+            citiesTextarea.value = 'Casablanca, Tangier, Agadir, Essaouira';
+            break;
+        case 'imperial':
+            citiesTextarea.value = 'Fez, Meknes, Marrakech, Rabat';
+            break;
+    }
+}
+</script>
+{% endblock %}

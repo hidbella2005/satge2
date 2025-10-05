@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Cities - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-map-marked-alt me-2"></i>Manage Cities</h1>
+            <p class="text-muted">Create, view, and manage cities for hotel locations.</p>
+        </div>
+    </div>
+
+    <!-- Add City Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Add New City</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin_create_city') }}">
+                {{ form.hidden_tag() }}
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control") }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.country.label(class="form-label") }}
+                        {{ form.country(class="form-control", value="Morocco") }}
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        {{ form.submit(class="btn btn-primary w-100") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cities Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">All Cities ({{ cities|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if cities %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>City Name</th>
+                            <th>Country</th>
+                            <th>Hotels Count</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for city in cities %}
+                        <tr>
+                            <td>{{ city.id }}</td>
+                            <td>
+                                <i class="fas fa-city me-2"></i>{{ city.name }}
+                            </td>
+                            <td>{{ city.country }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ city.hotels|length }} hotels</span>
+                            </td>
+                            <td>{{ city.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                {% if city.hotels|length == 0 %}
+                                <form method="POST" action="{{ url_for('admin_delete_city', city_id=city.id) }}" 
+                                      style="display: inline;" 
+                                      onsubmit="return confirm('Are you sure you want to delete this city?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button class="btn btn-sm btn-outline-danger" disabled 
+                                        title="Cannot delete city with hotels">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No cities found. Add your first city to get started.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

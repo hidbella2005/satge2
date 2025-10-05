@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Hotel Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h1>
+            <p class="text-muted">Welcome to the hotel management system administration panel.</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">{{ stats.total_users }}</h3>
+                            <p class="card-text">Total Users</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin_users') }}" class="text-white text-decoration-none">
+                        View Details <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">{{ stats.total_hotels }}</h3>
+                            <p class="card-text">Total Hotels</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-hotel fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin_hotels') }}" class="text-white text-decoration-none">
+                        View Details <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">{{ stats.total_cities }}</h3>
+                            <p class="card-text">Cities</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-map-marked-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin_cities') }}" class="text-white text-decoration-none">
+                        View Details <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">{{ stats.available_hotels }}</h3>
+                            <p class="card-text">Available Hotels</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="text-white">
+                        {{ stats.total_categories }} Categories
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Hotels by City</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="cityChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Hotels by Category</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Hotels -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Hotels</h5>
+                    <a href="{{ url_for('admin_hotels') }}" class="btn btn-sm btn-outline-primary">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_hotels %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>City</th>
+                                    <th>Category</th>
+                                    <th>Price/Night</th>
+                                    <th>Rating</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hotel in recent_hotels %}
+                                <tr>
+                                    <td>{{ hotel.name }}</td>
+                                    <td>{{ hotel.city.name }}</td>
+                                    <td>{{ hotel.category.name }}</td>
+                                    <td>${{ "%.2f"|format(hotel.price_per_night) }}</td>
+                                    <td>
+                                        {% for i in range(5) %}
+                                            {% if i < hotel.rating %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-muted"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% if hotel.is_available %}
+                                            <span class="badge bg-success">Available</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Unavailable</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ hotel.created_at.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-hotel fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No hotels found. <a href="{{ url_for('admin_hotels') }}">Add your first hotel</a>.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// City Chart
+const cityCtx = document.getElementById('cityChart').getContext('2d');
+const cityChart = new Chart(cityCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [{% for city, count in city_data %}'{{ city }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for city, count in city_data %}{{ count }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF',
+                '#FF9F40'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Category Chart
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+const categoryChart = new Chart(categoryCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for category, count in category_data %}'{{ category }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Hotels',
+            data: [{% for category, count in category_data %}{{ count }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: '#36A2EB',
+            borderColor: '#36A2EB',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
